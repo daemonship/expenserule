@@ -7,6 +7,7 @@ from fastapi import APIRouter, HTTPException, Request, UploadFile
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 
+from expenserule.categorization import suggest_category
 from expenserule.database import UPLOADS_DIR, ensure_dirs
 from expenserule.llm import parse_receipt, preprocess_file
 
@@ -84,11 +85,17 @@ async def parse_upload(file: UploadFile) -> JSONResponse:
             detail=f"LLM parsing failed: {exc}",
         ) from exc
 
+    # Auto-categorize using correction_memory → lookup → LLM
+    categorization = suggest_category(extracted["merchant"])
+
     return JSONResponse(
         {
             "upload_id": upload_id,
             "merchant": extracted["merchant"],
             "date": extracted["date"],
             "amount": extracted["amount"],
+            "category": categorization["category"],
+            "schedule_c_line": categorization["schedule_c_line"],
+            "category_source": categorization["source"],
         }
     )

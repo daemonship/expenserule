@@ -66,3 +66,81 @@ def save_api_key(key: str) -> None:
 def load_api_key() -> str:
     """Read the stored API key."""
     return API_KEY_PATH.read_text().strip()
+
+
+# ---------------------------------------------------------------------------
+# Correction memory helpers
+# ---------------------------------------------------------------------------
+
+
+def get_correction(merchant: str) -> str | None:
+    """Return the remembered category for a merchant, or None if unknown."""
+    with get_connection() as conn:
+        row = conn.execute(
+            "SELECT category FROM correction_memory WHERE merchant = ?",
+            (merchant.lower(),),
+        ).fetchone()
+    return row["category"] if row else None
+
+
+def upsert_correction(merchant: str, category: str) -> None:
+    """Store or update a merchant→category mapping in correction_memory."""
+    with get_connection() as conn:
+        conn.execute(
+            """
+            INSERT INTO correction_memory (merchant, category) VALUES (?, ?)
+            ON CONFLICT(merchant) DO UPDATE SET category = excluded.category
+            """,
+            (merchant.lower(), category),
+        )
+
+
+# ---------------------------------------------------------------------------
+# Expense helpers
+# ---------------------------------------------------------------------------
+
+
+def save_expense(
+    merchant: str,
+    date: str,
+    amount: float,
+    category: str,
+    schedule_c_line: str,
+    notes: str = "",
+    upload_id: str | None = None,
+) -> int:
+    """Insert a new expense record and return its id."""
+    with get_connection() as conn:
+        cur = conn.execute(
+            """
+            INSERT INTO expenses (merchant, date, amount, category, schedule_c_line, notes)
+            VALUES (?, ?, ?, ?, ?, ?)
+            """,
+            (merchant, date, amount, category, schedule_c_line, notes),
+        )
+        return cur.lastrowid  # type: ignore[return-value]
+
+
+def update_expense_category(expense_id: int, category: str, schedule_c_line: str) -> bool:
+    """Update the category on an existing expense. Returns True if a row was changed."""
+    with get_connection() as conn:
+        cur = conn.execute(
+            "UPDATE expenses SET category = ?, schedule_c_line = ? WHERE id = ?",
+            (category, schedule_c_line, expense_id),
+        )
+        return cur.rowcount > 0
+
+
+def list_expenses(year: int | None = None) -> list[sqlite3.Row]:
+    """Return expenses ordered newest-first, optionally filtered by year."""
+    with get_connection() as conn:
+        if year is not None:
+            rows = conn.execute(
+                "SELECT * FROM expenses WHERE strftime('%Y', date) = ? ORDER BY date DESC",
+                (str(year),),
+            ).fetchall()
+        else:
+            rows = conn.execute(
+                "SELECT * FROM expenses ORDER BY date DESC"
+            ).fetchall()
+    return rows
