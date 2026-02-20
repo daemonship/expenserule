@@ -8,7 +8,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from expenserule.database import init_db, is_first_run
-from expenserule.routers import expenses, setup
+from expenserule.routers import expenses, setup, upload
 
 # Resolve the package directory so static/template paths are absolute
 PKG_DIR = Path(__file__).parent
@@ -20,6 +20,7 @@ app.mount("/static", StaticFiles(directory=PKG_DIR / "static"), name="static")
 templates = Jinja2Templates(directory=str(PKG_DIR / "templates"))
 
 app.include_router(setup.router)
+app.include_router(upload.router)
 app.include_router(expenses.router)
 
 

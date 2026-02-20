@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Receipt — ExpenseRule{% endblock %}
+
+{% block content %}
+<section>
+  <hgroup>
+    <h2>Upload Receipt</h2>
+    <p>Upload a JPEG, PNG, or PDF receipt. Fields will be extracted automatically for your review.</p>
+  </hgroup>
+
+  <form id="upload-form" enctype="multipart/form-data">
+    <label for="file">
+      Receipt file (JPEG, PNG, or PDF, max 20 MB)
+      <input type="file" id="file" name="file" accept=".jpg,.jpeg,.png,.pdf" required />
+    </label>
+
+    <button type="submit" id="upload-btn">Extract Fields</button>
+  </form>
+
+  <div id="upload-status" aria-live="polite" style="margin-top: 1rem;"></div>
+
+  <!-- Review form — hidden until extraction succeeds -->
+  <form id="review-form" method="post" action="/expenses" style="display: none;">
+    <input type="hidden" id="upload_id" name="upload_id" />
+
+    <fieldset>
+      <legend>Review Extracted Fields</legend>
+
+      <label for="merchant">
+        Merchant
+        <input type="text" id="merchant" name="merchant" required />
+      </label>
+
+      <div class="grid">
+        <label for="date">
+          Date
+          <input type="date" id="date" name="date" required />
+        </label>
+        <label for="amount">
+          Amount ($)
+          <input type="number" id="amount" name="amount" step="0.01" min="0" required />
+        </label>
+      </div>
+    </fieldset>
+
+    <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+      <button type="submit">Save Expense</button>
+      <button type="button" class="secondary" onclick="resetForm()">Start Over</button>
+    </div>
+  </form>
+</section>
+
+<script>
+  const uploadForm = document.getElementById('upload-form');
+  const reviewForm = document.getElementById('review-form');
+  const statusDiv = document.getElementById('upload-status');
+  const uploadBtn = document.getElementById('upload-btn');
+
+  uploadForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const fileInput = document.getElementById('file');
+    if (!fileInput.files.length) return;
+
+    uploadBtn.disabled = true;
+    uploadBtn.setAttribute('aria-busy', 'true');
+    statusDiv.textContent = 'Uploading and extracting…';
+    reviewForm.style.display = 'none';
+
+    const formData = new FormData();
+    formData.append('file', fileInput.files[0]);
+
+    try {
+      const resp = await fetch('/upload/parse', { method: 'POST', body: formData });
+      const data = await resp.json();
+
+      if (!resp.ok) {
+        statusDiv.innerHTML = `<mark>Error: ${data.detail || 'Upload failed.'}</mark>`;
+        return;
+      }
+
+      // Populate review form
+      document.getElementById('upload_id').value = data.upload_id;
+      document.getElementById('merchant').value = data.merchant || '';
+      document.getElementById('date').value = data.date || '';
+      document.getElementById('amount').value = data.amount != null ? data.amount : '';
+
+      statusDiv.textContent = 'Extraction complete — review and save below.';
+      reviewForm.style.display = 'block';
+    } catch (err) {
+      statusDiv.innerHTML = `<mark>Network error: ${err.message}</mark>`;
+    } finally {
+      uploadBtn.disabled = false;
+      uploadBtn.removeAttribute('aria-busy');
+    }
+  });
+
+  function resetForm() {
+    uploadForm.reset();
+    reviewForm.style.display = 'none';
+    statusDiv.textContent = '';
+  }
+</script>
+{% endblock %}
