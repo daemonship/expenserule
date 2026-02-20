@@ -1,61 +1,68 @@
 <!doctype html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="color-scheme" content="light dark" />
-  <title>ExpenseRule — Setup</title>
-  <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
-  />
+  <meta name="color-scheme" content="dark" />
+  <title>ExpenseRule &mdash; Setup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" />
   <link rel="stylesheet" href="/static/css/app.css" />
 </head>
 <body>
-  <main class="container" style="max-width: 520px; margin-top: 4rem;">
-    <article>
-      <h2>Welcome to ExpenseRule</h2>
+  <main class="container">
+    <div class="setup-wrap">
 
-      <section>
-        <h3>Privacy Notice</h3>
-        <p>
-          ExpenseRule processes your receipts locally. Only the image content
-          of each receipt is sent to the OpenAI API (GPT-4o-mini) to extract
-          merchant name, date, and amount. No receipt data is stored on
-          OpenAI's servers beyond the duration of the API call. Your expense
-          records are stored in a SQLite database on this machine only.
-        </p>
-        <p>
-          Your OpenAI API key is stored in
-          <code>~/.expenserule/openai_api_key</code> with
-          <code>600</code> file permissions (readable only by you).
-        </p>
-      </section>
+      <div class="setup-masthead">
+        <span class="wordmark">ExpenseRule</span>
+        <span class="wordmark-sub">Automated receipt categorization for freelancers</span>
+      </div>
 
-      <hr />
+      <div class="setup-card">
+        <div class="privacy-notice">
+          <div class="privacy-notice-heading">&#x25CF;&nbsp; Privacy &amp; Data Notice</div>
+          <p>
+            ExpenseRule processes your receipts entirely on this machine. Only the image
+            content of each receipt is sent to the OpenAI API (GPT-4o-mini) to extract
+            merchant name, date, and total amount. No receipt data is retained on
+            OpenAI&rsquo;s servers beyond the duration of each API call.
+          </p>
+          <p>
+            Your expense records are stored in a SQLite database at
+            <code>~/.expenserule/expenses.db</code>. Your API key is stored at
+            <code>~/.expenserule/openai_api_key</code> with <code>600</code> permissions
+            &mdash; readable only by your user account.
+          </p>
+        </div>
 
-      <form method="post" action="/setup">
-        <label for="api_key">
-          OpenAI API Key
-          <input
-            type="password"
-            id="api_key"
-            name="api_key"
-            placeholder="sk-..."
-            required
-            autocomplete="off"
-          />
-          <small>
-            Get your key at
-            <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">
-              platform.openai.com/api-keys
-            </a>
-          </small>
-        </label>
+        <div class="setup-form-area">
+          <form method="post" action="/setup">
+            <label for="api_key">
+              OpenAI API Key
+              <input
+                type="password"
+                id="api_key"
+                name="api_key"
+                placeholder="sk-proj-..."
+                required
+                autocomplete="off"
+              />
+              <small>
+                Obtain your key at
+                <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer">
+                  platform.openai.com/api-keys
+                </a>
+              </small>
+            </label>
 
-        <button type="submit">Save and continue</button>
-      </form>
-    </article>
+            <button type="submit">Save and continue &rarr;</button>
+          </form>
+        </div>
+      </div>
+
+    </div>
   </main>
 </body>
 </html>

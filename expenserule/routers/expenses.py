@@ -4,14 +4,15 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from fastapi import APIRouter, HTTPException, Request
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi import APIRouter, Form, HTTPException, Request
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field
 
 from expenserule.categories import CATEGORY_LINE, SCHEDULE_C_CATEGORIES
 from expenserule.categorization import suggest_category
 from expenserule.database import (
+    get_expense_years,
     list_expenses,
     save_expense,
     update_expense_category,
@@ -45,7 +46,7 @@ class UpdateCategoryRequest(BaseModel):
 
 
 # ---------------------------------------------------------------------------
-# Routes
+# HTML routes
 # ---------------------------------------------------------------------------
 
 
@@ -53,14 +54,76 @@ class UpdateCategoryRequest(BaseModel):
 async def expense_list(request: Request) -> HTMLResponse:
     rows = list_expenses()
     expenses = [dict(row) for row in rows]
+    total = sum(e["amount"] for e in expenses)
+    years = get_expense_years()
     return _templates.TemplateResponse(
         "index.html",
         {
             "request": request,
             "expenses": expenses,
             "categories": SCHEDULE_C_CATEGORIES,
+            "total": total,
+            "years": years,
         },
     )
+
+
+@router.get("/expenses/partial", response_class=HTMLResponse)
+async def expense_list_partial(
+    request: Request,
+    category_filter: str = "",
+    year_filter: str = "",
+) -> HTMLResponse:
+    """htmx endpoint: returns just the expense table HTML for the filter bar."""
+    year = int(year_filter) if year_filter else None
+    rows = list_expenses(year=year)
+    expenses = [dict(row) for row in rows]
+    if category_filter:
+        expenses = [e for e in expenses if e["category"] == category_filter]
+    total = sum(e["amount"] for e in expenses)
+    return _templates.TemplateResponse(
+        "partials/expense_table.html",
+        {"request": request, "expenses": expenses, "total": total},
+    )
+
+
+@router.get("/new", response_class=HTMLResponse)
+async def new_expense_page(request: Request) -> HTMLResponse:
+    return _templates.TemplateResponse(
+        "new.html",
+        {"request": request, "categories": SCHEDULE_C_CATEGORIES},
+    )
+
+
+@router.post("/expenses")
+async def save_expense_form(
+    merchant: str = Form(...),
+    date: str = Form(...),
+    amount: float = Form(...),
+    category: str = Form(...),
+    notes: str = Form(default=""),
+    upload_id: str = Form(default=""),
+) -> RedirectResponse:
+    """Handle HTML form submission from the upload review and manual entry forms."""
+    if category not in CATEGORY_LINE:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Unknown category '{category}'.",
+        )
+    save_expense(
+        merchant=merchant,
+        date=date,
+        amount=amount,
+        category=category,
+        schedule_c_line=CATEGORY_LINE[category],
+        notes=notes,
+    )
+    return RedirectResponse(url="/", status_code=303)
+
+
+# ---------------------------------------------------------------------------
+# JSON API routes
+# ---------------------------------------------------------------------------
 
 
 @router.get("/api/expenses")

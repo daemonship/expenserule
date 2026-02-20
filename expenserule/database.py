@@ -144,3 +144,12 @@ def list_expenses(year: int | None = None) -> list[sqlite3.Row]:
                 "SELECT * FROM expenses ORDER BY date DESC"
             ).fetchall()
     return rows
+
+
+def get_expense_years() -> list[int]:
+    """Return distinct years present in the expenses table, newest first."""
+    with get_connection() as conn:
+        rows = conn.execute(
+            "SELECT DISTINCT strftime('%Y', date) AS year FROM expenses ORDER BY year DESC"
+        ).fetchall()
+    return [int(row["year"]) for row in rows if row["year"]]

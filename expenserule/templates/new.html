@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Manual Entry &mdash; ExpenseRule{% endblock %}
+
+{% block content %}
+<div class="entry-card">
+  <div class="entry-card-header">
+    <h2>Manual Entry</h2>
+    <p>Add an expense without uploading a receipt</p>
+  </div>
+
+  <form method="post" action="/expenses">
+    <div class="entry-card-body">
+
+      <label for="merchant">
+        Merchant
+        <input
+          type="text"
+          id="merchant"
+          name="merchant"
+          required
+          maxlength="200"
+          autocomplete="off"
+          placeholder="e.g. Adobe, Uber, Starbucks&hellip;"
+          hx-get="/api/categorize"
+          hx-trigger="blur changed delay:300ms"
+          hx-target="#category-hint"
+          hx-swap="innerHTML"
+          hx-vals='js:{"merchant": document.getElementById("merchant").value}'
+          hx-on::after-request="applyHint(event)"
+        />
+      </label>
+
+      <div id="category-hint" class="category-hint"></div>
+
+      <div class="grid">
+        <label for="date">
+          Date
+          <input type="date" id="date" name="date" required />
+        </label>
+        <label for="amount">
+          Amount ($)
+          <input type="number" id="amount" name="amount" step="0.01" min="0.01" required placeholder="0.00" />
+        </label>
+      </div>
+
+      <label for="category">
+        Category
+        <select id="category" name="category" required>
+          {% for cat in categories %}
+          <option value="{{ cat.name }}">{{ cat.name }} &mdash; Line {{ cat.line }}</option>
+          {% endfor %}
+        </select>
+      </label>
+
+      <label for="notes">
+        Notes <small class="text-muted">(optional)</small>
+        <textarea id="notes" name="notes" rows="2" maxlength="1000" placeholder="Client meeting, project name, purpose&hellip;"></textarea>
+      </label>
+
+    </div>
+
+    <div class="entry-card-footer">
+      <button type="submit">Save Expense</button>
+      <a href="/" role="button" class="secondary outline">Cancel</a>
+    </div>
+  </form>
+</div>
+
+<script>
+  // Pre-populate today's date
+  document.addEventListener('DOMContentLoaded', () => {
+    const dateField = document.getElementById('date');
+    if (!dateField.value) {
+      dateField.value = new Date().toISOString().slice(0, 10);
+    }
+  });
+
+  // After merchant blur, pre-select the suggested category and show hint
+  function applyHint(event) {
+    try {
+      const data = JSON.parse(event.detail.xhr.responseText);
+      const hintEl = document.getElementById('category-hint');
+      const categoryEl = document.getElementById('category');
+
+      if (data && data.category) {
+        // Pre-select in dropdown
+        for (const opt of categoryEl.options) {
+          if (opt.value === data.category) {
+            opt.selected = true;
+            break;
+          }
+        }
+
+        // Show hint
+        const srcMap = {
+          'correction_memory': 'remembered from past correction',
+          'lookup':            'matched merchant lookup table',
+          'llm':               'AI suggestion',
+        };
+        const srcLabel = srcMap[data.source] || data.source;
+        hintEl.className = 'category-hint hint-ok';
+        hintEl.textContent = `\u2192 ${data.category} (Line ${data.schedule_c_line}) \u2014 ${srcLabel}`;
+      }
+    } catch (_) {
+      // Ignore parse errors (empty merchant, etc.)
+    }
+  }
+</script>
+{% endblock %}

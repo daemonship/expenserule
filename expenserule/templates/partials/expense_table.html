@@ -1,0 +1,40 @@
+{% if expenses %}
+<div class="expense-table-wrap">
+  <figure>
+    <table class="expense-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Merchant</th>
+          <th class="col-amount">Amount</th>
+          <th>Category</th>
+          <th class="col-line">Line</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for expense in expenses %}
+        <tr>
+          <td class="col-date">{{ expense.date }}</td>
+          <td class="col-merchant">{{ expense.merchant }}</td>
+          <td class="col-amount">${{ "%.2f"|format(expense.amount) }}</td>
+          <td class="col-category"><span class="cat-badge">{{ expense.category }}</span></td>
+          <td class="col-line">{{ expense.schedule_c_line }}</td>
+          <td class="col-notes">{{ expense.notes or "&mdash;" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </figure>
+  <div class="table-summary">
+    <span>{{ expenses|length }} expense{{ 's' if expenses|length != 1 else '' }}</span>
+    <span class="total-amount">${{ "%.2f"|format(total) }}</span>
+  </div>
+</div>
+{% else %}
+<div class="empty-state">
+  <span class="empty-icon">&#x1F9FE;</span>
+  <p>No expenses match the current filters.</p>
+  <a href="/upload" role="button">Upload a receipt</a>
+</div>
+{% endif %}

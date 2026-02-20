@@ -1,26 +1,31 @@
 <!doctype html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="color-scheme" content="light dark" />
+  <meta name="color-scheme" content="dark" />
   <title>{% block title %}ExpenseRule{% endblock %}</title>
-  <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
-  />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" />
   <link rel="stylesheet" href="/static/css/app.css" />
   <script src="https://unpkg.com/htmx.org@1.9.12" defer></script>
 </head>
 <body>
-  <header class="container">
-    <nav>
+  <header class="container-fluid">
+    <nav class="container">
       <ul>
-        <li><strong>ExpenseRule</strong></li>
+        <li>
+          <a href="/" class="site-brand">
+            <span class="site-logo">ExpenseRule</span>
+            <span class="site-tagline">Schedule C</span>
+          </a>
+        </li>
       </ul>
       <ul>
         <li><a href="/">Expenses</a></li>
-        <li><a href="/upload">Upload Receipt</a></li>
+        <li><a href="/upload">Upload</a></li>
         <li><a href="/new">Manual Entry</a></li>
       </ul>
     </nav>
@@ -31,7 +36,7 @@
   </main>
 
   <footer class="container">
-    <small>ExpenseRule — local-first receipt categorization</small>
+    <small>ExpenseRule &mdash; local-first receipt categorization</small>
   </footer>
 </body>
 </html>

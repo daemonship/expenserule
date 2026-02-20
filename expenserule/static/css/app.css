@@ -1,18 +1,675 @@
-/* ExpenseRule custom styles */
+/* ==========================================================
+   ExpenseRule — Dark Ledger Theme
+   Fonts: Cormorant Garamond (display) · DM Sans (UI) · DM Mono (data)
+   Loaded via base.html <link> tags — no @import needed here.
+   ========================================================== */
 
-header nav {
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
+/* ----------------------------------------------------------
+   Color system — override Pico dark theme tokens
+   ---------------------------------------------------------- */
+:root,
+[data-theme="dark"] {
+  --er-bg:            #080d14;
+  --er-surface:       #0d1620;
+  --er-surface-2:     #13202e;
+  --er-border:        #1c2f42;
+  --er-border-subtle: #162030;
+  --er-text:          #c8daea;
+  --er-text-muted:    #4a6070;
+  --er-text-dim:      #2e4558;
+  --er-accent:        #2dd4bf;
+  --er-accent-dim:    rgba(45, 212, 191, 0.08);
+  --er-accent-glow:   rgba(45, 212, 191, 0.20);
+  --er-green:         #4ade80;
+  --er-amber:         #fbbf24;
+  --er-red:           #f87171;
+
+  /* Override Pico variables */
+  --pico-background-color:      var(--er-bg);
+  --pico-color:                 var(--er-text);
+  --pico-border-color:          var(--er-border);
+  --pico-muted-color:           var(--er-text-muted);
+  --pico-muted-border-color:    var(--er-border-subtle);
+  --pico-primary:               var(--er-accent);
+  --pico-primary-background:    var(--er-accent);
+  --pico-primary-hover:         #5ee7d4;
+  --pico-primary-focus:         var(--er-accent-glow);
+  --pico-card-background-color: var(--er-surface);
+  --pico-card-border-color:     var(--er-border);
+  --pico-table-border-color:    var(--er-border);
+  --pico-h1-color:              #e8f4ff;
+  --pico-h2-color:              #d4e8f8;
+  --pico-h3-color:              #c8daea;
+  --pico-form-element-background-color:           var(--er-surface-2);
+  --pico-form-element-border-color:               var(--er-border);
+  --pico-form-element-color:                      var(--er-text);
+  --pico-form-element-focus-color:                var(--er-accent);
+  --pico-form-element-placeholder-color:          var(--er-text-dim);
+  --pico-form-element-active-background-color:    var(--er-surface-2);
+  --pico-form-element-active-border-color:        var(--er-accent);
+  --pico-dropdown-background-color:               var(--er-surface-2);
+  --pico-dropdown-border-color:                   var(--er-border);
+  --pico-dropdown-color:                          var(--er-text);
 }
 
-footer {
-  margin-top: 3rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--pico-muted-border-color);
-  color: var(--pico-muted-color);
+/* ----------------------------------------------------------
+   Base typography
+   ---------------------------------------------------------- */
+body {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  background-color: var(--er-bg);
+  color: var(--er-text);
 }
 
-/* Tighten the expense table */
-table td, table th {
-  padding: 0.5rem 0.75rem;
+h1, h2, h3, h4 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
 }
+
+h1 { font-size: 2.25rem; }
+h2 { font-size: 1.75rem; }
+h3 { font-size: 1.375rem; }
+
+hgroup p {
+  color: var(--er-text-muted);
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+code, kbd, pre {
+  font-family: 'DM Mono', 'Fira Code', monospace;
+}
+
+/* ----------------------------------------------------------
+   Header / navigation
+   ---------------------------------------------------------- */
+body > header {
+  border-bottom: 1px solid var(--er-border);
+  background: var(--er-surface);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+body > header nav {
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  align-items: center;
+}
+
+.site-brand {
+  display: flex;
+  align-items: baseline;
+  gap: 0.625rem;
+  text-decoration: none;
+}
+
+.site-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.5rem;
+  font-style: italic;
+  font-weight: 600;
+  color: var(--er-accent);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.site-tagline {
+  font-size: 0.6875rem;
+  font-family: 'DM Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--er-text-dim);
+  padding-left: 0.625rem;
+  border-left: 1px solid var(--er-border);
+}
+
+body > header nav ul:last-child {
+  gap: 0.25rem;
+}
+
+body > header nav ul:last-child a {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--er-text-muted);
+  text-decoration: none;
+  padding: 0.375rem 0.75rem;
+  border-radius: 6px;
+  transition: color 0.15s, background 0.15s;
+}
+
+body > header nav ul:last-child a:hover {
+  color: var(--er-text);
+  background: var(--er-surface-2);
+}
+
+/* ----------------------------------------------------------
+   Main content
+   ---------------------------------------------------------- */
+body > main {
+  padding-top: 2.5rem;
+  padding-bottom: 3rem;
+  min-height: calc(100vh - 120px);
+}
+
+/* ----------------------------------------------------------
+   Footer
+   ---------------------------------------------------------- */
+body > footer {
+  margin-top: 0;
+  padding: 1.25rem 0;
+  border-top: 1px solid var(--er-border-subtle);
+}
+
+body > footer small {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.6875rem;
+  color: var(--er-text-dim);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ----------------------------------------------------------
+   Page header row
+   ---------------------------------------------------------- */
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+  flex-wrap: wrap;
+}
+
+.page-header hgroup { margin: 0; }
+.page-header hgroup h2 { margin: 0; }
+
+.action-bar {
+  display: flex;
+  gap: 0.625rem;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* ----------------------------------------------------------
+   Buttons
+   ---------------------------------------------------------- */
+[role="button"],
+button,
+input[type="submit"] {
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+  font-size: 0.875rem;
+  border-radius: 6px;
+}
+
+a[role="button"].outline,
+button.outline {
+  border-color: var(--er-border);
+  color: var(--er-text-muted);
+  background: transparent;
+}
+
+a[role="button"].outline:hover,
+button.outline:hover {
+  border-color: var(--er-text-muted);
+  color: var(--er-text);
+  background: transparent;
+}
+
+/* ----------------------------------------------------------
+   Filter bar
+   ---------------------------------------------------------- */
+.filter-bar {
+  display: flex;
+  gap: 0.875rem;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 0.75rem 1rem;
+  background: var(--er-surface);
+  border: 1px solid var(--er-border);
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.filter-bar label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--er-text-muted);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.filter-bar select {
+  margin: 0;
+  padding: 0.3125rem 2rem 0.3125rem 0.625rem;
+  font-size: 0.8125rem;
+  min-width: 170px;
+  height: auto;
+  border-color: var(--er-border);
+  background-color: var(--er-surface-2);
+}
+
+.filter-divider {
+  width: 1px;
+  height: 1.25rem;
+  background: var(--er-border);
+  flex-shrink: 0;
+}
+
+/* ----------------------------------------------------------
+   Expense table
+   ---------------------------------------------------------- */
+.expense-table-wrap {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid var(--er-border);
+}
+
+.expense-table-wrap figure {
+  margin: 0;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.expense-table {
+  margin: 0;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.expense-table thead th {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--er-text-muted);
+  background: var(--er-surface);
+  border-bottom: 1px solid var(--er-border);
+  padding: 0.625rem 1rem;
+  white-space: nowrap;
+}
+
+.col-amount { text-align: right; }
+
+.expense-table tbody tr {
+  border-bottom: 1px solid var(--er-border-subtle);
+  transition: background 0.1s;
+}
+
+.expense-table tbody tr:last-child { border-bottom: none; }
+
+.expense-table tbody tr:hover { background: var(--er-accent-dim); }
+
+.expense-table tbody td {
+  padding: 0.6875rem 1rem;
+  font-size: 0.875rem;
+  vertical-align: middle;
+}
+
+.col-date {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.8125rem;
+  color: var(--er-text-muted);
+  white-space: nowrap;
+}
+
+.col-merchant {
+  font-weight: 500;
+}
+
+.col-amount {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--er-green);
+  white-space: nowrap;
+}
+
+.col-category {
+  font-size: 0.8125rem;
+}
+
+.col-line {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--er-text-dim);
+  text-align: center;
+}
+
+.col-notes {
+  font-size: 0.8125rem;
+  color: var(--er-text-muted);
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cat-badge {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background: var(--er-surface-2);
+  border: 1px solid var(--er-border);
+  color: var(--er-text-muted);
+  white-space: nowrap;
+}
+
+/* Table summary footer */
+.table-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.625rem 1rem;
+  background: var(--er-surface);
+  border-top: 1px solid var(--er-border);
+  font-size: 0.8125rem;
+  color: var(--er-text-muted);
+}
+
+.table-summary .total-amount {
+  font-family: 'DM Mono', monospace;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--er-green);
+}
+
+/* ----------------------------------------------------------
+   Empty state
+   ---------------------------------------------------------- */
+.empty-state {
+  text-align: center;
+  padding: 3.5rem 2rem;
+  color: var(--er-text-muted);
+  border: 1px solid var(--er-border);
+  border-radius: 8px;
+  background: var(--er-surface);
+}
+
+.empty-state .empty-icon {
+  font-size: 2.25rem;
+  margin-bottom: 0.75rem;
+  display: block;
+  opacity: 0.35;
+}
+
+.empty-state p { margin: 0 0 1.25rem; }
+
+/* ----------------------------------------------------------
+   Upload page
+   ---------------------------------------------------------- */
+.upload-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 768px) {
+  .upload-layout { grid-template-columns: 1fr; }
+}
+
+.upload-zone {
+  border: 2px dashed var(--er-border);
+  border-radius: 10px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  background: var(--er-surface);
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.upload-zone:has(input:focus),
+.upload-zone:hover {
+  border-color: var(--er-accent);
+  background: var(--er-accent-dim);
+}
+
+.upload-icon {
+  font-size: 2.25rem;
+  display: block;
+  margin-bottom: 0.75rem;
+  opacity: 0.4;
+}
+
+.upload-status {
+  margin-top: 0.875rem;
+  font-size: 0.875rem;
+  min-height: 1.5rem;
+}
+
+.status-ok  { color: var(--er-green); font-family: 'DM Mono', monospace; font-size: 0.8125rem; }
+.status-err { color: var(--er-red); }
+
+/* Review card */
+.review-card {
+  background: var(--er-surface);
+  border: 1px solid var(--er-border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.review-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.875rem 1.25rem;
+  border-bottom: 1px solid var(--er-border);
+  background: var(--er-surface-2);
+}
+
+.review-card-header h3 {
+  font-size: 0.75rem;
+  font-family: 'DM Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--er-text-muted);
+  margin: 0;
+}
+
+.source-badge {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  border-radius: 4px;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: var(--er-surface);
+  color: var(--er-text-muted);
+  border: 1px solid var(--er-border);
+}
+
+.source-badge.src-correction { color: var(--er-accent); border-color: var(--er-accent-glow); }
+.source-badge.src-lookup     { color: var(--er-green);  border-color: rgba(74, 222, 128, 0.25); }
+.source-badge.src-llm        { color: var(--er-amber);  border-color: rgba(251, 191, 36, 0.25); }
+
+.review-card-body {
+  padding: 1.25rem;
+}
+
+.review-card-body label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--er-text-muted);
+}
+
+.review-actions {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--er-border);
+  background: var(--er-surface-2);
+}
+
+/* ----------------------------------------------------------
+   Manual entry / new expense card
+   ---------------------------------------------------------- */
+.entry-card {
+  max-width: 560px;
+  background: var(--er-surface);
+  border: 1px solid var(--er-border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.entry-card-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--er-border);
+}
+
+.entry-card-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.entry-card-header p {
+  margin: 0.25rem 0 0;
+  font-size: 0.875rem;
+  color: var(--er-text-muted);
+}
+
+.entry-card-body {
+  padding: 1.5rem;
+}
+
+.entry-card-body label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--er-text-muted);
+}
+
+.entry-card-footer {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--er-border);
+  background: var(--er-surface-2);
+}
+
+.category-hint {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--er-text-dim);
+  margin-top: -0.625rem;
+  margin-bottom: 0.75rem;
+  min-height: 1rem;
+  transition: color 0.2s;
+}
+
+.category-hint.hint-ok { color: var(--er-accent); }
+
+/* ----------------------------------------------------------
+   Setup / first-run
+   ---------------------------------------------------------- */
+.setup-wrap {
+  max-width: 500px;
+  margin: 3rem auto 0;
+}
+
+.setup-masthead {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.wordmark {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 3rem;
+  font-style: italic;
+  font-weight: 600;
+  color: var(--er-accent);
+  letter-spacing: -0.02em;
+  line-height: 1;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.wordmark-sub {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--er-text-muted);
+}
+
+.setup-card {
+  background: var(--er-surface);
+  border: 1px solid var(--er-border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.privacy-notice {
+  padding: 1.25rem 1.5rem;
+  background: var(--er-surface-2);
+  border-bottom: 1px solid var(--er-border);
+}
+
+.privacy-notice-heading {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--er-accent);
+  margin-bottom: 0.75rem;
+}
+
+.privacy-notice p {
+  font-size: 0.8125rem;
+  color: var(--er-text-muted);
+  margin: 0 0 0.5rem;
+  line-height: 1.65;
+}
+
+.privacy-notice p:last-child { margin: 0; }
+
+.privacy-notice code {
+  font-size: 0.75rem;
+  color: var(--er-amber);
+  background: rgba(251, 191, 36, 0.08);
+  padding: 0.0625rem 0.3125rem;
+  border-radius: 3px;
+}
+
+.setup-form-area {
+  padding: 1.5rem;
+}
+
+.setup-form-area label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--er-text-muted);
+}
+
+/* ----------------------------------------------------------
+   htmx indicator
+   ---------------------------------------------------------- */
+.htmx-indicator {
+  display: none;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--er-text-muted);
+}
+
+.htmx-request .htmx-indicator,
+.htmx-request.htmx-indicator { display: inline; }
+
+/* ----------------------------------------------------------
+   Utilities
+   ---------------------------------------------------------- */
+.text-muted  { color: var(--er-text-muted); }
+.text-accent { color: var(--er-accent); }
+.text-green  { color: var(--er-green); }
+.text-amber  { color: var(--er-amber); }

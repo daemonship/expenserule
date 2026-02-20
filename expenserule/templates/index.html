@@ -1,49 +1,55 @@
 {% extends "base.html" %}
 
-{% block title %}Expenses — ExpenseRule{% endblock %}
+{% block title %}Expenses &mdash; ExpenseRule{% endblock %}
 
 {% block content %}
-<section>
+<div class="page-header">
   <hgroup>
     <h2>Expenses</h2>
-    <p>All categorized receipts and manual entries.</p>
+    <p>All categorized receipts and manual entries</p>
   </hgroup>
-
-  <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+  <div class="action-bar">
     <a href="/upload" role="button">Upload Receipt</a>
     <a href="/new" role="button" class="secondary">Manual Entry</a>
     <a href="/export/csv" role="button" class="outline">Export CSV</a>
   </div>
+</div>
 
-  {% if expenses %}
-  <figure>
-    <table>
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Merchant</th>
-          <th>Amount</th>
-          <th>Category</th>
-          <th>Sch. C Line</th>
-          <th>Notes</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for expense in expenses %}
-        <tr>
-          <td>{{ expense.date }}</td>
-          <td>{{ expense.merchant }}</td>
-          <td>${{ "%.2f"|format(expense.amount) }}</td>
-          <td>{{ expense.category }}</td>
-          <td>{{ expense.schedule_c_line }}</td>
-          <td>{{ expense.notes }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </figure>
-  {% else %}
-  <p>No expenses yet. <a href="/upload">Upload a receipt</a> or <a href="/new">add one manually</a>.</p>
-  {% endif %}
-</section>
+<form
+  id="filter-form"
+  class="filter-bar"
+  hx-get="/expenses/partial"
+  hx-trigger="change"
+  hx-target="#expense-results"
+  hx-swap="innerHTML"
+  hx-indicator="#filter-spinner"
+>
+  <label>
+    Category
+    <select name="category_filter">
+      <option value="">All categories</option>
+      {% for cat in categories %}
+      <option value="{{ cat.name }}">{{ cat.name }} (Line {{ cat.line }})</option>
+      {% endfor %}
+    </select>
+  </label>
+
+  <div class="filter-divider"></div>
+
+  <label>
+    Year
+    <select name="year_filter">
+      <option value="">All years</option>
+      {% for year in years %}
+      <option value="{{ year }}">{{ year }}</option>
+      {% endfor %}
+    </select>
+  </label>
+
+  <span id="filter-spinner" class="htmx-indicator text-muted">&#x25CC; filtering&hellip;</span>
+</form>
+
+<div id="expense-results">
+  {% include "partials/expense_table.html" %}
+</div>
 {% endblock %}

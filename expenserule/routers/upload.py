@@ -24,7 +24,11 @@ MAX_UPLOAD_BYTES = 20 * 1024 * 1024  # 20 MB
 
 @router.get("/upload", response_class=HTMLResponse)
 async def upload_page(request: Request) -> HTMLResponse:
-    return _templates.TemplateResponse("upload.html", {"request": request})
+    from expenserule.categories import SCHEDULE_C_CATEGORIES
+
+    return _templates.TemplateResponse(
+        "upload.html", {"request": request, "categories": SCHEDULE_C_CATEGORIES}
+    )
 
 
 @router.post("/upload/parse")
