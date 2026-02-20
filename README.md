@@ -4,6 +4,20 @@ Automated receipt categorization for freelancers. Snap a photo of a receipt,
 get the merchant, date, and amount extracted by GPT-4o-mini, and have it
 auto-assigned to the correct Schedule C line.
 
+## Status
+
+> 🚧 In active development — not yet production ready
+
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Project scaffold & CI | ✅ Complete | FastAPI, SQLite, Pico CSS |
+| Receipt upload & parsing | ✅ Complete | Pillow preprocessing + GPT-4o-mini vision |
+| Categorization engine | ✅ Complete | 200-merchant lookup, correction memory, LLM fallback |
+| Web UI | ✅ Complete | Expense list, upload flow, manual entry, first-run setup |
+| CSV export with year filter | ✅ Complete | `/export/csv?year=YYYY`, CSV injection prevention |
+| PR review | 🚧 In Progress | |
+| Push & open PR | 📋 Planned | |
+
 ## Quick start
 
 ```bash
