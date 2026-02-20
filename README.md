@@ -1,0 +1,32 @@
+# ExpenseRule
+
+Automated receipt categorization for freelancers. Snap a photo of a receipt,
+get the merchant, date, and amount extracted by GPT-4o-mini, and have it
+auto-assigned to the correct Schedule C line.
+
+## Quick start
+
+```bash
+pip install .
+expenserule        # opens http://127.0.0.1:8765 in your browser
+```
+
+On first run you will be prompted for your OpenAI API key. It is stored in
+`~/.expenserule/openai_api_key` with `600` permissions (owner-read only).
+
+## Requirements
+
+- Python 3.11+
+- An OpenAI API key (GPT-4o-mini vision)
+- `poppler-utils` system package (for PDF receipt support via pdf2image)
+
+## Data storage
+
+All data lives locally in `~/.expenserule/`:
+
+```
+~/.expenserule/
+├── expenses.db        ← SQLite database
+├── openai_api_key     ← API key (chmod 600)
+└── uploads/           ← Original receipt files
+```
