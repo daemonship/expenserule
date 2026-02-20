@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+import csv
+import io
 from pathlib import Path
 
 from fastapi import APIRouter, Form, HTTPException, Request
-from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, StreamingResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field
 
@@ -205,3 +207,42 @@ async def api_categorize(merchant: str) -> JSONResponse:
         raise HTTPException(status_code=422, detail="merchant must not be empty")
     result = suggest_category(merchant)
     return JSONResponse(result)
+
+
+# ---------------------------------------------------------------------------
+# CSV export
+# ---------------------------------------------------------------------------
+
+
+def _csv_safe(value: str) -> str:
+    """Prefix cells that start with formula-trigger characters to prevent CSV injection."""
+    if value and value[0] in ("=", "+", "-", "@", "\t", "\r"):
+        return "'" + value
+    return value
+
+
+@router.get("/export/csv")
+async def export_csv(year: int | None = None) -> StreamingResponse:
+    """Download all expenses (or a single year) as a CSV file."""
+    rows = list_expenses(year=year)
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(["date", "merchant", "amount", "category", "schedule_c_line", "notes"])
+    for row in rows:
+        writer.writerow([
+            _csv_safe(str(row["date"])),
+            _csv_safe(str(row["merchant"])),
+            f"{row['amount']:.2f}",
+            _csv_safe(str(row["category"])),
+            _csv_safe(str(row["schedule_c_line"])),
+            _csv_safe(str(row["notes"])),
+        ])
+
+    filename = f"expenses-{year}.csv" if year else "expenses.csv"
+    output.seek(0)
+    return StreamingResponse(
+        iter([output.getvalue()]),
+        media_type="text/csv",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )

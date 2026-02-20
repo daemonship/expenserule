@@ -11,7 +11,15 @@
   <div class="action-bar">
     <a href="/upload" role="button">Upload Receipt</a>
     <a href="/new" role="button" class="secondary">Manual Entry</a>
-    <a href="/export/csv" role="button" class="outline">Export CSV</a>
+    <form method="get" action="/export/csv" class="export-form">
+      <select name="year" aria-label="Export year">
+        <option value="">All years</option>
+        {% for year in years %}
+        <option value="{{ year }}">{{ year }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit" class="outline">Export CSV</button>
+    </form>
   </div>
 </div>
 
